@@ -65,6 +65,32 @@ func (s *Storage) IsVisited(requestID string) (bool, error) {
 	return isVisited, err
 }
 
+// Clear visited for site id
+func (s *Storage) ClearVisited(siteID int) error {
+	target := strconv.Itoa(siteID) + "--"
+	err := s.db.Update(func(tx *bolt.Tx) error {
+		requestBucket := tx.Bucket(requestBucketName)
+		if requestBucket == nil {
+			return nil
+		}
+		c := requestBucket.Cursor()
+		prefix := []byte(target)
+		for k, _ := c.Seek(prefix); bytes.HasPrefix(k, prefix); k, _ = c.Next() {
+			if err := requestBucket.Delete(k); err != nil {
+				fmt.Println("error delete key", err)
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println("error clear cache", err)
+	}
+	return nil
+}
+
 // Cookies retrieves stored cookies for a given host{}
 func (s *Storage) Cookies(u *url.URL) string {
 	var cookies string
