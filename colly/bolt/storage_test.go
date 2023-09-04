@@ -34,7 +34,7 @@ func TestStorage(t *testing.T) {
 		t.Error("failed to initialize client: " + err.Error())
 	}
 	// test visit
-	var requestID uint64 = 1
+	var requestID string = "1"
 	if isVisited, err := s.IsVisited(requestID); isVisited != false || err != nil {
 		t.Fatal("unexpected result", isVisited, err)
 	}

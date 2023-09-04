@@ -1,9 +1,11 @@
 package bolt
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"net/url"
+	"strconv"
 
 	bolt "go.etcd.io/bbolt"
 )
@@ -44,20 +46,20 @@ func (s *Storage) Init() error {
 }
 
 // Visited receives and stores a request ID that is visited by the Collector{}
-func (s *Storage) Visited(requestID uint64) error {
+func (s *Storage) Visited(requestID string) error {
 	return s.db.Update(func(tx *bolt.Tx) error {
 		requestBucket := tx.Bucket(requestBucketName)
-		return requestBucket.Put(uint64toByteArray(requestID), []byte{})
+		return requestBucket.Put([]byte(requestID), []byte{})
 	})
 }
 
 // IsVisited returns true if the request was visited before IsVisited{}
 // is called{}
-func (s *Storage) IsVisited(requestID uint64) (bool, error) {
+func (s *Storage) IsVisited(requestID string) (bool, error) {
 	var isVisited bool
 	err := s.db.View(func(tx *bolt.Tx) error {
 		requestBucket := tx.Bucket(requestBucketName)
-		isVisited = requestBucket.Get(uint64toByteArray(requestID)) != nil
+		isVisited = requestBucket.Get([]byte(requestID)) != nil
 		return nil
 	})
 	return isVisited, err
