@@ -1,4 +1,4 @@
-module github.com/elonzh/colly-bolt-storage
+module github.com/dinver/colly-bolt-storage
 
 go 1.12
 
